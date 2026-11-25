@@ -1,0 +1,4 @@
+dist/
+.local/
+trip-settings.local.json
+*.tar.gz
