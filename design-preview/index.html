@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- Geographic route overlay and topographic basemap. -->
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#243a30">
+  <meta name="description" content="מפת המסלול, תכנון יומי ויומן התמונות של טרק מסטיה–אושגולי בסוואנתי">
+  <title>יומן שטח | מסטיה–אושגולי</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="field.css">
+  <script type="module" src="field.js"></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-inner">
+  <a class="brand" href="#home">יומן שטח <span>סוואנתי</span></a>
+  <nav class="field-nav" aria-label="ניווט ראשי"><a href="#home">היום</a><a href="#map">מפה</a><a href="#photos">יומן</a><a href="#more">עוד</a></nav>
+  <button id="offline" class="outline compact" type="button">↓ שמירה ללא קליטה</button>
+</div></header>
+<main class="wrap" id="home">
+  <p id="offline-status" class="status field-offline" role="status" hidden></p>
+  <div data-view="today">
+  <section class="hero" aria-labelledby="title">
+    <img data-media="mestia" alt="" fetchpriority="high">
+    <div class="hero-inner"><p class="region">סוואנתי עילית · גאורגיה</p><h1 id="title">ממסטיה לאושגולי</h1><p class="hero-date" id="trip-dates"></p><a id="hero-action" class="primary" href="#day/1">יום ההליכה הראשון ←</a></div>
+    
+  </section>
+  <div class="trip-stats"><div><strong>4</strong><span>ימי הליכה</span></div><div><strong id="total-distance">—</strong><span>ק״מ במסלול</span></div><div><strong>4</strong><span>מטיילים</span></div><div><strong>2,737</strong><span>מ׳ בנקודה הגבוהה</span></div></div>
+  
+  <section class="daily" aria-labelledby="days-title"><div class="section-head"><div><h2 id="days-title">ימי ההליכה</h2></div></div><div id="day-cards" class="day-cards"></div></section>
+  <section id="day" class="panel day-detail" aria-label="פרטי יום הליכה"></section>
+  </div>
+  <section class="map-section" data-view="map" id="map" aria-labelledby="map-title"><div class="section-head"><div><h2 id="map-title">מפת הטרק</h2><p>ארבעה מקטעים ממסטיה לאושגולי, לפי קובצי ה־GPX.</p></div><button type="button" class="primary" id="location">◎ המיקום שלי</button></div>
+    <div class="panel map-panel"><div class="map-tools"><div id="map-filter" class="map-filter" aria-label="בחירת מקטע במפה"></div><div class="zoom"><button type="button" class="outline" id="zoom-in" aria-label="הגדלה">+</button><button type="button" class="outline" id="zoom-out" aria-label="הקטנה">−</button></div></div><div id="route-map"></div><p id="gps-status" class="map-status" role="status">הפעילו מיקום כדי לראות כמה ק״מ נשארו במקטע שבחרתם.</p></div>
+  </section>
+  <section id="photos" data-view="photos" class="panel photo-panel" aria-labelledby="photos-title"><div class="section-head"><div><h2 id="photos-title">יומן תמונות</h2><p id="photos-day"></p></div><label class="primary upload">+ הוספת תמונות<input id="photo-input" type="file" accept="image/*" multiple></label></div>
+    <div id="photo-days" class="map-filter" aria-label="יום לשיוך התמונות"></div><p id="photo-status" class="status" role="status" aria-live="polite"></p><div id="gallery" class="gallery"></div>
+  </section>
+  <section id="more" class="panel photo-panel" data-view="more" aria-labelledby="more-title" hidden><h2 id="more-title">מידע לדרך</h2><div class="day-links"><a class="outline" href="gpx/day-1-mestia-zhabeshi.gpx" download>GPX יום 1</a><a class="outline" href="gpx/day-2-zhabeshi-adishi.gpx" download>GPX יום 2</a><a class="outline" href="gpx/day-3-adishi-iprali.gpx" download>GPX יום 3</a><a class="outline" href="gpx/day-4-iprali-ushguli.gpx" download>GPX יום 4</a></div><p class="status">תצוגת עיצוב · תמונות והוצאות בהדגמה נשמרות במכשיר.</p><a href="../">חזרה לגרסה הקיימת</a></section>
+  <footer><a href="https://www.caucasus-trekking.com/treks/trek-mestia-to-ushguli" target="_blank" rel="noopener noreferrer">מקור המסלול</a><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a><details><summary>קרדיטים לצילומי הנוף</summary><ul id="credits"></ul></details></footer>
+</main>
+<noscript>האפליקציה דורשת JavaScript להצגת המפה ויומן התמונות.</noscript>
+</body>
+</html>
