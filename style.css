@@ -15,3 +15,14 @@
 .map-attribution,.map-background-status{position:absolute;z-index:2;padding:3px 7px;background:#fffdf3e8;color:#273c30;font-size:.68rem;line-height:1.35;border-radius:4px}
 .map-attribution{inset-inline-end:4px;bottom:4px;max-width:calc(100% - 8px)}
 .map-background-status{inset-inline-start:6px;top:6px}
+
+.expense-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:12px 0 20px}
+.expense-form label{display:grid;gap:5px;min-width:105px;flex:1 1 130px;font-weight:700;color:var(--forest)}
+.expense-form label:nth-child(2){flex-basis:210px}
+.expense-form input,.expense-form select{font:inherit;min-height:44px;width:100%;padding:.55rem;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink)}
+.expense-form input[name="amount"]{direction:ltr;text-align:right}
+.expense-results{margin-top:16px}
+.expense-results h3,.expense-results h4{margin:0 0 8px}
+.expense-results article+article{margin-top:8px}
+.expense-results ul{padding-inline-start:1.3rem;margin:5px 0}
+.expense-transfers{font-weight:750;color:var(--forest)}

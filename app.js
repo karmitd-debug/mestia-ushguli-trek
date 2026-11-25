@@ -1,3 +1,4 @@
+import { mountExpenses } from './expenses.js';
 import { itinerary, georgiaToday, formatDate, km } from './route.js';
 import { mapControls } from './map.js';
 import { photoJournal } from './photos.js';
@@ -197,3 +198,5 @@ offlineButton.onclick = async () => {
   } catch { offlineStatus.textContent = 'שמירה ללא קליטה לא הושלמה. נסו שוב בחיבור יציב.'; }
   finally { offlineButton.disabled = false; }
 };
+
+mountExpenses({ shared: false });
