@@ -16,7 +16,7 @@ async function loadTrip() {
     try { return JSON.parse(localStorage.getItem('svaneti-trip')) || {}; } catch { return {}; }
   }
 }
-const config = await loadTrip();
+const config = {};
 for (const [i, day] of itinerary.entries()) if (config.days?.[i]) Object.assign(day, config.days[i]);
 const today = itinerary.find(day => day.date === georgiaToday());
 let dayId = today?.id || 1;
@@ -27,12 +27,12 @@ const chip = (day, title) => `<span class="chip" style="--accent:${day.color}"><
 const link = (url, title, extra = '') => `<a class="outline" href="${url}" target="_blank" rel="noopener noreferrer" ${extra}>${title}</a>`;
 const dayButton = (day, selected) => `<button type="button" data-value="${day.id}" aria-pressed="${selected}" style="--accent:${day.color}"><span class="dot"></span>יום ${day.id}</button>`;
 const actions = byId('hero-action');
-byId('trip-dates').textContent = config.label || 'טרק של ארבעה ימים';
+byId('trip-dates').textContent = 'ארבעה ימי הליכה בסוואנתי';
 if (today) { actions.href = `#day/${today.id}`; actions.textContent = 'למסלול של היום ←'; }
 byId('total-distance').textContent = km(itinerary.reduce((sum, day) => sum + day.track.length, 0));
-byId('day-cards').innerHTML = itinerary.map(day => `<a class="day-card" style="--accent:${day.color}" href="#day/${day.id}" data-day="${day.id}"><div class="card-image"><img src="media/${day.image}" alt="${media[day.image][4]}">${chip(day, `יום ${day.id}${today?.id === day.id ? ' · היום' : ''}`)}</div><div class="card-copy"><time datetime="${day.date}">${day.date ? formatDate(day.date) : ""}</time><h3>${day.title}</h3><small>${km(day.track.length)} ק״מ · ${day.range}</small></div></a>`).join('');
+byId('day-cards').innerHTML = itinerary.map(day => `<a class="day-card" style="--accent:${day.color}" href="#day/${day.id}" data-day="${day.id}"><div class="card-image"><img data-media="${day.image}" alt="${media[day.image][4]}">${chip(day, `יום ${day.id}${today?.id === day.id ? ' · היום' : ''}`)}</div><div class="card-copy"><time datetime="${day.date}">${day.date ? formatDate(day.date) : ""}</time><h3>${day.title}</h3><small>${km(day.track.length)} ק״מ · ${day.range}</small></div></a>`).join('');
 for (const img of document.querySelectorAll('.hero img, .card-image img')) {
-  const key = img.getAttribute('src').split('/').at(-1);
+  const key = img.dataset.media;
   const sources = imageSource(key);
   function fallback() {
     const next = sources.shift();
@@ -40,12 +40,12 @@ for (const img of document.querySelectorAll('.hero img, .card-image img')) {
     else img.hidden = true;
   }
   img.addEventListener('error', fallback);
-  if (img.complete && !img.naturalWidth) fallback();
+  fallback();
 }
 byId('credits').innerHTML = Object.values(media).map(([file,, author, license, place]) => `<li>${place} — <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(file)}" target="_blank" rel="noopener">${author}</a> · <a href="https://creativecommons.org/${license.startsWith('zero') ? 'publicdomain' : 'licenses'}/${license}/" target="_blank" rel="noopener">${license.toUpperCase()}</a></li>`).join('');
 
 const map = mapControls({ container: byId('route-map'), status: byId('gps-status'), locate: byId('location'), setFilter });
-const photos = photoJournal({ input: byId('photo-input'), gallery: byId('gallery'), status: byId('photo-status') });
+const photos = photoJournal({ input: byId('photo-input'), gallery: byId('gallery'), status: byId('photo-status'), shared: false });
 const photoStatus = byId('photos-day');
 const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 

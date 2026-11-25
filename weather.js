@@ -16,7 +16,7 @@ function display(element, record, cached) {
 }
 
 export async function showWeather(day, element) {
-  if (!day.date) { element.textContent = 'תחזית יומית תופיע לאחר הגדרת תאריכי הטרק.'; return; }
+  if (!day.date) { element.textContent = 'תחזית יומית תופיע בגרסה עם תאריכי הטרק.'; return; }
   const offset = Math.round((dateMs(day.date) - dateMs(georgiaToday())) / 86400000);
   const key = `svaneti-weather-${day.date}`;
   const old = saved(key);

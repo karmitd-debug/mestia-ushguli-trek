@@ -45,7 +45,7 @@ async function scaledJpeg(file) {
   } finally { URL.revokeObjectURL(url); }
 }
 
-export function photoJournal({ input, gallery, status }) {
+export function photoJournal({ input, gallery, status, shared = true }) {
   let day = 1, remote = [], rendering = 0, inFlight, addedWhileSyncing = false, notice = '';
 
   const dialog = document.createElement('dialog');
@@ -84,15 +84,16 @@ export function photoJournal({ input, gallery, status }) {
         dialog.querySelector('img').src = link.href;
         dialog.showModal();
       });
-      caption.textContent = photo.pending ? 'ממתינה לסנכרון' : 'באלבום המשותף';
+      caption.textContent = !shared ? 'שמורה במכשיר' : photo.pending ? 'ממתינה לסנכרון' : 'באלבום המשותף';
       figure.append(link, caption);
       gallery.append(figure);
     }
     const waiting = local.filter(photo => photo.pending).length;
-    status.textContent = [notice, waiting ? `${waiting} תמונות ממתינות לסנכרון.` : 'תמונות שסונכרנו זמינות למשתתפי הטרק.'].filter(Boolean).join(' ');
+    status.textContent = !shared ? 'בתצוגה המקדימה, התמונות זמינות במכשיר הזה.' : [notice, waiting ? `${waiting} תמונות ממתינות לסנכרון.` : 'תמונות שסונכרנו זמינות למשתתפי הטרק.'].filter(Boolean).join(' ');
   }
 
   async function sync() {
+    if (!shared) return draw();
     if (inFlight) { addedWhileSyncing = true; return inFlight; }
     if (!navigator.onLine) { notice = 'אין כרגע חיבור לאינטרנט.'; return draw(); }
     inFlight = (async () => {
@@ -123,7 +124,7 @@ export function photoJournal({ input, gallery, status }) {
     status.textContent = `שומרים תמונות ליום ${targetDay}…`;
     let failed = 0;
     for (const file of files) {
-      try { await save({ id: crypto.randomUUID(), day: targetDay, created: Date.now(), blob: await scaledJpeg(file), pending: true }); }
+      try { await save({ id: crypto.randomUUID(), day: targetDay, created: Date.now(), blob: await scaledJpeg(file), pending: shared }); }
       catch { failed++; }
     }
     input.disabled = false;
