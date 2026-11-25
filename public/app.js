@@ -69,12 +69,14 @@ function showDay(id) {
   for (const card of document.querySelectorAll('[data-day]')) card.setAttribute('aria-current', String(Number(card.dataset.day) === id));
   const element = byId('day');
   element.style.setProperty('--accent', day.color);
-  element.innerHTML = `${chip(day, `יום ${id} · ${day.date ? formatDate(day.date) : ""}${today?.id === id ? ' · היום' : ''}`)}<h2>${day.title}</h2><div class="detail-grid"><div><div class="metrics"><span>${km(day.track.length)} ק״מ</span><span>${day.range}</span><span>${day.effort}</span></div><h3>מהלך הדרך</h3><ol class="steps">${day.pointsOfInterest.map(step => `<li>${step}</li>`).join('')}</ol><p class="attention">${day.note}</p><div class="day-links"><a class="outline" id="day-map" href="#map">מקטע היום במפה</a><a class="outline" href="gpx/${day.file}" download>↓ קובץ GPX</a><a class="outline" href="#photos">תמונות מהיום</a><a class="outline" href="${routeGuide}#day${id}">מדריך המסלול המלא</a></div></div><div class="side-stack"><div class="inset"><h3>מזג האוויר במסלול</h3><p>נקודת תחזית: כ־${Math.round(day.weather[2])} מ׳, באזור הגבוה במקטע.</p><p id="forecast" role="status"></p><div class="day-links"><button id="refresh-weather" class="outline" type="button">רענון תחזית</button></div></div><div class="inset"><h3>לינה בסוף היום</h3><p><b dir="ltr">${escape(day.stay)}</b></p><div class="day-links">${day.booking ? link(`https://www.booking.com/hotel/ge/${day.booking}.he.html`, 'דף מקום הלינה') : ''}${link(travels, 'ההזמנה שלי ב־Booking', 'id="booking-entry"')}</div><details><summary>שמירת קישור ישיר להזמנה</summary><p>הדביקי קישור לניהול ההזמנה שקיבלת מ־Booking. הוא יישמר בדפדפן הזה בלבד.</p><form class="booking-form"><input type="url" name="booking" maxlength="3000" placeholder="https://…" aria-label="קישור פרטי להזמנה"><button class="outline" type="submit">שמירה</button><button class="outline" type="button" id="clear-booking">איפוס קישור</button><p id="booking-status" role="status"></p></form></details></div></div></div>`;
+  element.innerHTML = `${chip(day, `יום ${id} · ${day.date ? formatDate(day.date) : ""}${today?.id === id ? ' · היום' : ''}`)}<h2>${day.title}</h2><div class="detail-grid"><div><div class="metrics"><span>${km(day.track.length)} ק״מ</span><span>${day.range}</span><span>${day.effort}</span></div><h3>מהלך הדרך</h3><ol class="steps">${day.pointsOfInterest.map(step => `<li>${step}</li>`).join('')}</ol><p class="attention">${day.note}</p><div class="day-links"><a class="outline" id="day-map" href="#map">מקטע היום במפה</a><a class="outline" href="gpx/${day.file}" download>↓ קובץ GPX</a><a class="outline" href="#photos">תמונות מהיום</a><a class="outline" href="${routeGuide}#day${id}">מדריך המסלול המלא</a></div></div><div class="side-stack"><div class="inset"><h3>מזג האוויר במסלול</h3><p>נקודת תחזית: כ־${Math.round(day.weather[2])} מ׳, באזור הגבוה במקטע.</p><p id="forecast" role="status"></p><div class="day-links"><button id="refresh-weather" class="outline" type="button">רענון תחזית</button></div></div><div class="inset"><h3>לינה בסוף היום</h3><p><b dir="ltr">${escape(day.stay)}</b></p><div class="day-links">${day.booking ? link(`https://www.booking.com/hotel/ge/${day.booking}.he.html`, 'דף מקום הלינה') : ''}${link(travels, 'ההזמנה שלי ב־Booking', 'id="booking-entry"')}<a class="outline" id="booking-confirmation" target="_blank" rel="noopener noreferrer" hidden>אישור הלינה ב־Gmail</a></div><details><summary>שמירת קישור ישיר להזמנה</summary><p>הדביקי קישור לניהול ההזמנה שקיבלת מ־Booking. הוא יישמר בדפדפן הזה בלבד.</p><form class="booking-form"><input type="url" name="booking" maxlength="3000" placeholder="https://…" aria-label="קישור פרטי להזמנה"><button class="outline" type="submit">שמירה</button><button class="outline" type="button" id="clear-booking">איפוס קישור</button><p id="booking-status" role="status"></p></form></details></div></div></div>`;
   const forecast = byId('forecast');
   showWeather(day, forecast);
   byId('refresh-weather').onclick = () => showWeather(day, forecast);
   byId('day-map').onclick = () => setFilter(id);
   bookingControls(element, id);
+  const confirmation = byId('booking-confirmation');
+  if (confirmation) setConfirmationLink(confirmation, confirmations?.stays[id - 1]);
   setPhotoDay(id);
 }
 
@@ -121,30 +123,81 @@ byId('zoom-out').onclick = () => map.zoom(1/1.3);
 const flightPanel = document.createElement('section');
 flightPanel.id = 'flights';
 flightPanel.className = 'panel photo-panel';
-flightPanel.innerHTML = '<div class="section-head"><div><h2>כרטיסי טיסה</h2><p id="flight-status" role="status"></p></div><a class="primary" hidden id="flight-open" target="_blank" rel="noopener noreferrer">פתיחת אישור הלוך וחזור</a></div>';
+flightPanel.innerHTML = `
+  <div class="section-head"><div><h2>אישורי טיסה ולינה</h2><p id="flight-status" role="status"></p></div></div>
+  <div class="day-links">
+    <a class="primary" id="flight-open" hidden target="_blank" rel="noopener noreferrer">אישור טיסות הלוך וחזור</a>
+    <a class="outline" id="flight-details" hidden target="_blank" rel="noopener noreferrer">פרטי הטיסות</a>
+    <a class="outline" id="confirmations-pdf" hidden target="_blank" rel="noopener noreferrer">הורדת PDF</a>
+  </div>
+  <div id="stay-confirmations" hidden>
+    <h3>אישורי לינה ב־Gmail</h3>
+    <ul>
+      ${['30.6 · Guest House Victor', '1.7 · Guest house River side', "2.7 · Elo’s Guesthouse", '3.7 · Hotel Tekla'].map((title, i) =>
+        `<li><a id="stay-confirmation-${i}" dir="ltr" target="_blank" rel="noopener noreferrer">${title}</a></li>`).join('')}
+    </ul>
+  </div>`;
 document.querySelector('.trip-stats').after(flightPanel);
-const flightButton = byId('flight-open');
-flightButton.style.display = 'none';
-const flightStatus = byId('flight-status');
+
 const flightKey = 'svaneti-ticket-gmail-id';
+const confirmationsKey = 'svaneti-private-confirmations';
 const validTicket = value => typeof value === 'string' && /^[0-9a-f]{16}$/.test(value);
 let ticket;
-try { ticket = localStorage.getItem(flightKey); } catch { /* Session still works. */ }
+let confirmations;
+
+function parseConfirmations(value) {
+  const data = JSON.parse(value);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data?.account) ||
+      !validTicket(data.flight) || !validTicket(data.details) ||
+      !Array.isArray(data.stays) || data.stays.length !== 4 || !data.stays.every(validTicket) ||
+      !/^libfile_[0-9a-f]+$/.test(data.pdf)) throw new Error('Invalid confirmations');
+  return data;
+}
+
+try { ticket = localStorage.getItem(flightKey); } catch { /* Keep the section usable. */ }
+try { confirmations = parseConfirmations(localStorage.getItem(confirmationsKey)); } catch { /* The personal link can be opened again. */ }
+
+function setPrivateLink(element, url) {
+  element.hidden = !url;
+  element.style.display = url ? '' : 'none';
+  if (url) element.href = url;
+  else element.removeAttribute('href');
+}
+
+function setConfirmationLink(element, id) {
+  const mailbox = confirmations
+    ? `https://mail.google.com/mail/u/?authuser=${encodeURIComponent(confirmations.account)}`
+    : 'https://mail.google.com/mail/u/0/';
+  setPrivateLink(element, validTicket(id) ? `${mailbox}#all/${id}` : '');
+}
 
 function openFlightSection() {
+  const personal = /^#confirmations\/([a-z0-9_-]+)$/i.exec(location.hash);
   const incoming = /^#flight-ticket\/([0-9a-f]{16})$/.exec(location.hash);
-  if (incoming) {
+  let setupStatus = '';
+  if (personal) {
+    try {
+      const payload = atob(personal[1].replaceAll('-', '+').replaceAll('_', '/'));
+      confirmations = parseConfirmations(payload);
+      try { localStorage.setItem(confirmationsKey, JSON.stringify(confirmations)); }
+      catch { setupStatus = 'הקישורים זמינים כעת. כדי לפתוח אותם שוב, השתמשי בקישור האישי.'; }
+    } catch { setupStatus = 'הקישור האישי אינו תקין.'; }
+  } else if (incoming) {
     ticket = incoming[1];
     try { localStorage.setItem(flightKey, ticket); } catch { /* Use the link for this session. */ }
-    history.replaceState(null, '', '#flights');
-    flightPanel.scrollIntoView({ block: 'start' });
   }
-  flightButton.hidden = !validTicket(ticket);
-  flightButton.style.display = flightButton.hidden ? 'none' : 'inline-flex';
-  if (validTicket(ticket)) flightButton.href = `https://mail.google.com/mail/u/0/#all/${ticket}`;
-  flightStatus.textContent = validTicket(ticket)
-    ? 'אישור ההזמנה כולל את שתי הטיסות. הפתיחה דורשת כניסה לחשבון Gmail שקיבל את האישור.'
-    : 'אפשר לחבר את אישור ההזמנה במכשיר הזה באמצעות הקישור האישי.';
+  if (personal || incoming) history.replaceState(null, '', '#flights');
+  setConfirmationLink(byId('flight-open'), confirmations?.flight || ticket);
+  setConfirmationLink(byId('flight-details'), confirmations?.details);
+  setPrivateLink(byId('confirmations-pdf'), confirmations ? `https://chatgpt.com/api/library/files/${confirmations.pdf}/download` : '');
+  byId('stay-confirmations').hidden = !confirmations;
+  if (confirmations) confirmations.stays.forEach((id, i) => setConfirmationLink(byId(`stay-confirmation-${i}`), id));
+  const bookingConfirmation = byId('booking-confirmation');
+  if (bookingConfirmation) setConfirmationLink(bookingConfirmation, confirmations?.stays[dayId - 1]);
+  byId('flight-status').textContent = setupStatus || (confirmations || validTicket(ticket)
+    ? 'פתיחת ההודעות דורשת כניסה לחשבון Gmail שקיבל את האישורים.'
+    : 'פתחי את הקישור האישי כדי להציג את אישורי ההזמנות במכשיר הזה.');
+  if (location.hash === '#flights') flightPanel.scrollIntoView({ block: 'start' });
 }
 openFlightSection();
 window.addEventListener('hashchange', openFlightSection);
