@@ -138,6 +138,37 @@ byId('photo-days').onclick = event => {
 };
 byId('zoom-in').onclick = () => map.zoom(1.3);
 byId('zoom-out').onclick = () => map.zoom(1/1.3);
+const flightPanel = document.createElement('section');
+flightPanel.id = 'flights';
+flightPanel.className = 'panel photo-panel';
+flightPanel.innerHTML = '<div class="section-head"><div><h2>כרטיסי טיסה</h2><p id="flight-status" role="status"></p></div><a class="primary" hidden id="flight-open" target="_blank" rel="noopener noreferrer">פתיחת אישור הלוך וחזור</a></div>';
+document.querySelector('.trip-stats').after(flightPanel);
+const flightButton = byId('flight-open');
+flightButton.style.display = 'none';
+const flightStatus = byId('flight-status');
+const flightKey = 'svaneti-ticket-gmail-id';
+const validTicket = value => typeof value === 'string' && /^[0-9a-f]{16}$/.test(value);
+let ticket;
+try { ticket = localStorage.getItem(flightKey); } catch { /* Session still works. */ }
+
+function openFlightSection() {
+  const incoming = /^#flight-ticket\/([0-9a-f]{16})$/.exec(location.hash);
+  if (incoming) {
+    ticket = incoming[1];
+    try { localStorage.setItem(flightKey, ticket); } catch { /* Use the link for this session. */ }
+    history.replaceState(null, '', '#flights');
+    flightPanel.scrollIntoView({ block: 'start' });
+  }
+  flightButton.hidden = !validTicket(ticket);
+  flightButton.style.display = flightButton.hidden ? 'none' : 'inline-flex';
+  if (validTicket(ticket)) flightButton.href = `https://mail.google.com/mail/u/0/#all/${ticket}`;
+  flightStatus.textContent = validTicket(ticket)
+    ? 'אישור ההזמנה כולל את שתי הטיסות. הפתיחה דורשת כניסה לחשבון Gmail שקיבל את האישור.'
+    : 'אפשר לחבר את אישור ההזמנה במכשיר הזה באמצעות הקישור האישי.';
+}
+openFlightSection();
+window.addEventListener('hashchange', openFlightSection);
+
 const guidePanel = document.createElement('section');
 guidePanel.className = 'panel day-detail';
 guidePanel.id = 'daily-guide';
