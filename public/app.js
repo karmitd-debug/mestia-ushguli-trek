@@ -68,7 +68,7 @@ function showDay(id) {
   for (const card of document.querySelectorAll('[data-day]')) card.setAttribute('aria-current', String(Number(card.dataset.day) === id));
   const element = byId('day');
   element.style.setProperty('--accent', day.color);
-  element.innerHTML = `${chip(day, `יום ${id} · ${day.date ? formatDate(day.date) : ""}${today?.id === id ? ' · היום' : ''}`)}<h2>${day.title}</h2><div class="detail-grid"><div><div class="metrics"><span>${km(day.track.length)} ק״מ</span><span>${day.range}</span><span>${day.effort}</span></div><h3>מהלך הדרך</h3><ol class="steps">${day.pointsOfInterest.map(step => `<li>${step}</li>`).join('')}</ol><p class="attention">${day.note}</p><div class="day-links"><a class="outline" id="day-map" href="#map">מקטע היום במפה</a><a class="outline" href="gpx/${day.file}" download>↓ קובץ GPX</a><a class="outline" href="#photos">תמונות מהיום</a>${link(`${routeGuide}#day${id}`, 'מדריך המסלול המלא')}</div></div><div class="side-stack"><div class="inset"><h3>מזג האוויר במסלול</h3><p>נקודת תחזית: כ־${Math.round(day.weather[2])} מ׳, באזור הגבוה במקטע.</p><p id="forecast" role="status"></p><div class="day-links"><button id="refresh-weather" class="outline" type="button">רענון תחזית</button></div></div><div class="inset"><h3>לינה בסוף היום</h3><p><b dir="ltr">${escape(day.stay)}</b></p><div class="day-links">${day.booking ? link(`https://www.booking.com/hotel/ge/${day.booking}.he.html`, 'דף מקום הלינה') : ''}${link(travels, 'ההזמנה שלי ב־Booking', 'id="booking-entry"')}</div><details><summary>שמירת קישור ישיר להזמנה</summary><p>הדביקי קישור לניהול ההזמנה שקיבלת מ־Booking. הוא יישמר בדפדפן הזה בלבד.</p><form class="booking-form"><input type="url" name="booking" maxlength="3000" placeholder="https://…" aria-label="קישור פרטי להזמנה"><button class="outline" type="submit">שמירה</button><button class="outline" type="button" id="clear-booking">איפוס קישור</button><p id="booking-status" role="status"></p></form></details></div></div></div>`;
+  element.innerHTML = `${chip(day, `יום ${id} · ${day.date ? formatDate(day.date) : ""}${today?.id === id ? ' · היום' : ''}`)}<h2>${day.title}</h2><div class="detail-grid"><div><div class="metrics"><span>${km(day.track.length)} ק״מ</span><span>${day.range}</span><span>${day.effort}</span></div><h3>מהלך הדרך</h3><ol class="steps">${day.pointsOfInterest.map(step => `<li>${step}</li>`).join('')}</ol><p class="attention">${day.note}</p><div class="day-links"><a class="outline" id="day-map" href="#map">מקטע היום במפה</a><a class="outline" href="gpx/${day.file}" download>↓ קובץ GPX</a><a class="outline" href="#photos">תמונות מהיום</a><a class="outline" href="${routeGuide}#day${id}">מדריך המסלול המלא</a></div></div><div class="side-stack"><div class="inset"><h3>מזג האוויר במסלול</h3><p>נקודת תחזית: כ־${Math.round(day.weather[2])} מ׳, באזור הגבוה במקטע.</p><p id="forecast" role="status"></p><div class="day-links"><button id="refresh-weather" class="outline" type="button">רענון תחזית</button></div></div><div class="inset"><h3>לינה בסוף היום</h3><p><b dir="ltr">${escape(day.stay)}</b></p><div class="day-links">${day.booking ? link(`https://www.booking.com/hotel/ge/${day.booking}.he.html`, 'דף מקום הלינה') : ''}${link(travels, 'ההזמנה שלי ב־Booking', 'id="booking-entry"')}</div><details><summary>שמירת קישור ישיר להזמנה</summary><p>הדביקי קישור לניהול ההזמנה שקיבלת מ־Booking. הוא יישמר בדפדפן הזה בלבד.</p><form class="booking-form"><input type="url" name="booking" maxlength="3000" placeholder="https://…" aria-label="קישור פרטי להזמנה"><button class="outline" type="submit">שמירה</button><button class="outline" type="button" id="clear-booking">איפוס קישור</button><p id="booking-status" role="status"></p></form></details></div></div></div>`;
   const forecast = byId('forecast');
   showWeather(day, forecast);
   byId('refresh-weather').onclick = () => showWeather(day, forecast);
@@ -149,7 +149,12 @@ openFlightSection();
 window.addEventListener('hashchange', openFlightSection);
 
 function onHash() {
-  const match = location.hash.match(/^#(?:day|guide)\/([1-4])$/);
+  const oldGuide = /^#guide\/([1-4])$/.exec(location.hash);
+  if (oldGuide) {
+    location.replace(`${routeGuide}#day${oldGuide[1]}`);
+    return;
+  }
+  const match = location.hash.match(/^#day\/([1-4])$/);
   if (match) {
     showDay(Number(match[1]));
     byId('day').scrollIntoView({ block: 'start' });
