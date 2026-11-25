@@ -91,7 +91,7 @@ export async function handle(request, { assets, album, settings, identity }) {
     return new Response(request.method === 'HEAD' ? null : data, { headers: {
       'Content-Type': mime, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-cache',
       'Referrer-Policy': 'no-referrer',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: https://upload.wikimedia.org; connect-src 'self' https://api.open-meteo.com; object-src 'none'; base-uri 'none'; form-action 'self'"
+      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: https://upload.wikimedia.org https://services.arcgisonline.com https://tile.openstreetmap.org; connect-src 'self' https://api.open-meteo.com; object-src 'none'; base-uri 'none'; form-action 'self'"
     } });
   } catch (error) {
     console.error('Trek request failed:', error?.name);
