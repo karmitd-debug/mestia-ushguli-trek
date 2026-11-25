@@ -1,5 +1,5 @@
-const name = 'svaneti-journal-v7';
-const shell = ['./', 'index.html', 'app.js', 'style.css', 'route.js', 'tracks.js', 'map.js', 'photos.js', 'weather.js', 'media.js', 'manifest.webmanifest', 'icon.svg', 'gpx/day-1-mestia-zhabeshi.gpx', 'gpx/day-2-zhabeshi-adishi.gpx', 'gpx/day-3-adishi-iprali.gpx', 'gpx/day-4-iprali-ushguli.gpx'];
+const name = 'svaneti-journal-v8';
+const shell = ['./', 'index.html', 'app.js', 'app.js?v=route-guide-8', 'style.css', 'route.js', 'tracks.js', 'map.js', 'photos.js', 'weather.js', 'media.js', 'manifest.webmanifest', 'icon.svg', 'gpx/day-1-mestia-zhabeshi.gpx', 'gpx/day-2-zhabeshi-adishi.gpx', 'gpx/day-3-adishi-iprali.gpx', 'gpx/day-4-iprali-ushguli.gpx'];
 const media = ['mestia','zhabeshi','adishi','glacier','ushguli'];
 
 async function cacheShell() {
