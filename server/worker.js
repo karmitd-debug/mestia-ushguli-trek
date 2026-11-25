@@ -27,6 +27,7 @@ export default {
     return handle(request, {
       assets,
       settings: env.TRIP_SETTINGS,
+      expenseBucket: env.BUCKET,
       identity: id ? { email: request.headers.get('oai-authenticated-user-email') } : null,
       album: env.BUCKET ? bucketAlbum(env.BUCKET) : null
     });

@@ -1,3 +1,4 @@
+import { expenseEndpoint } from './expenses.js';
 import { imageSource, media } from '../public/media.js';
 
 const photoPath = /^api\/photos\/([1-4])\/([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/;
@@ -76,11 +77,12 @@ async function landscape(key) {
   return text('Landscape temporarily unavailable', 502);
 }
 
-export async function handle(request, { assets, album, settings, identity }) {
+export async function handle(request, { assets, album, expenseBucket, settings, identity }) {
   const url = new URL(request.url);
   const path = url.pathname.slice(1) || 'index.html';
   if (!identity) return text('Sign in to access the trip', 401);
   try {
+    if (path === 'api/expenses') return await expenseEndpoint(request, expenseBucket, settings, identity.email);
     if (path === 'api/trip' && request.method === 'GET') return json(tripDetails(settings, identity.email));
     if (path === 'api/photos' || path.startsWith('api/photos/')) return await photoRequest(request, path, album);
     if (request.method !== 'GET' && request.method !== 'HEAD') return text('Method not allowed', 405);
